@@ -1,20 +1,21 @@
 # Configurations
-title:            Jekyll Gitbook
-longtitle:        Jekyll Gitbook
-author:           HE Tao
-email:            sighingnow@gmail.com
+title:            Operating System 2025
+longtitle:        Operating System 2025
+author:           Jianhan Liu
+email:            jianhan.liu18@gmail.com
 description: >
-  Build Jekyll site with the GitBook style.
+  Operating System Lab 2025
 
 version:          1.0
 gitbook_version:  3.2.3
 
-url:              'https://sighingnow.github.io'
-baseurl:          '/jekyll-gitbook'
+url:              'https://feng-xu-oslab.github.io'
+baseurl:          '/oslab-book'
 rss:              RSS
 
 # bootstrap: use the remote theme for the site itself
 remote_theme: sighingnow/jekyll-gitbook
+port: 3000
 
 toc:
   enabled: true
