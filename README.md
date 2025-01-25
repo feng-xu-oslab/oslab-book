@@ -3,7 +3,6 @@ layout: home
 title: Introduction
 permalink: /
 ---
-# Introduction
 
 ## 实验环境
 
@@ -63,11 +62,10 @@ sudo apt-get dist-upgrade
 sudo apt install gcc-multilib g++-multilib
 ```
 
-{: .note }
-我们推荐使用Git进行项目版本管理，在整个OS实验过程中，你可能会尝试多个想法实现课程需求，也可能因为一条路走不通选择另外的思路。
-
-这时候Git就为你提供了一个在不同版本之间穿梭的机器，也可 能成为你调试不通时的**后悔药**。
-
+> 我们推荐使用Git进行项目版本管理，在整个OS实验过程中，你可能会尝试多个想法实现课程需求，也可能因为一条路走不通选择另外的思路。
+> 
+> 这时候Git就为你提供了一个在不同版本之间穿梭的机器，也可 能成为你调试不通时的**后悔药**。
+{: .block-note}
 
 安装好git之后，你需要先进行配置工作
 
@@ -200,7 +198,8 @@ ld -m elf_i386 -e start -Ttext 0x7c00 mbr.o -o mbr.elf
 
 我们发现mbr.elf的大小有3588byte，这个大小超过了一个扇区，不符合我们的要求
 
-{: .note }不管是i386还是i386之前的芯片，在加电后的第一条指令都是跳转到BIOS固件进行开机自检，然后将磁盘的主引导扇区（Master Boot Record, MBR ； 0 号柱面， 0 号磁头， 0 号扇区对应的扇区，512 字节，末尾两字节为魔数`0x55`和`0xaa`）加载到`0x7c00`
+不管是i386还是i386之前的芯片，在加电后的第一条指令都是跳转到BIOS固件进行开机自检，然后将磁盘的主引导扇区（Master Boot Record, MBR ； 0 号柱面， 0 号磁头， 0 号扇区对应的扇区，512 字节，末尾两字节为魔数`0x55`和`0xaa`）加载到`0x7c00`
+{: .block-note}
 
 所以我们使用objcopy命令尽量减少mbr程序的大小
 
