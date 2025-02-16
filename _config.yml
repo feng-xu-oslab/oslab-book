@@ -36,7 +36,7 @@ kramdown:
   syntax_highlighter_opts:
     guess_lang:           true
 
-syntax_highlighter_style: base16
+syntax_highlighter_style: github
 
 markdown_ext:             markdown,mkdown,mkdn,mkd,md
 
@@ -51,10 +51,10 @@ exclude:
 
 collections:
   pages:
-    output: true
+    output: false
     permalink: /:collection/:path/
   others:
-    output: true
+    output: false
     permalink: /:collection/:path/
 
 ordered_collections:
