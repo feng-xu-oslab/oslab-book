@@ -19,14 +19,15 @@ layout: post
 
 在物理机或VirtualBox上安装发行版Linux系统，例如Debian，Ubuntu，Arch，Fedora（x86，arm 架构皆可），在安装完成的Linux上安装QEMU，Vim，GCC，GDB，Binutils，Make，Perl，Git等工 具，以Ubuntu为例
 
-> 建议使用Ubuntu 18.04，这个发行版我们助教测试过没问题！
+> 建议使用Ubuntu 18.04，这个发行版我们助教测试过没问题！（你要是已经有别的发行版本，例如Ubuntu 20.04或者Ubuntu 22.04等，那不妨先用这个环境）
 > 
-> 其他版本我们不清楚生成的img不确定能不能在QEMU上运行。大概率你问我，我也回答不上来。
+> * 至于其他版本，我们不清楚生成的image能否在QEMU上运行。遇到问题，你问我，我大概率也回答不上来。
+> * 众所周知，近年来越来越多的计算机采用Arm架构，而本实验使用x86指令集架构。理论上只要是符合Unix规范的系统，能够运行QEMU。至于怎么编译出QEMU能够运行的x86代码，那就不是助教能够回答的了。
 {: .block-tip}
 
 ```bash
 sudo apt-get update
-sudo apt-get install qemu-system-x
+sudo apt-get install qemu-system-x86
 sudo apt-get install vim
 sudo apt-get install gcc
 sudo apt-get install gdb
@@ -55,7 +56,7 @@ i386
 说明已打开，否则需要手动打开
 
 ```bash
-sudo dpkg --add-architecture i
+sudo dpkg --add-architecture i386
 sudo apt-get update
 sudo apt-get dist-upgrade
 ```
@@ -70,7 +71,7 @@ sudo apt install gcc-multilib g++-multilib
 
 > 我们推荐使用Git进行项目版本管理，在整个OS实验过程中，你可能会尝试多个想法实现课程需求，也可能因为一条路走不通选择另外的思路。
 > 
-> 这时候Git就为你提供了一个在不同版本之间穿梭的机器，也可 能成为你调试不通时的**后悔药**。
+> 这时候Git就为你提供了一个在不同版本之间穿梭的机器，也可能成为你调试不通时的**后悔药**。
 {: .block-note}
 
 安装好git之后，你需要先进行配置工作
@@ -138,20 +139,22 @@ gdb
 在配置好实验环境之后，先建立一个操作系统实验文件夹存放本实验代码
 
 ```bash
-mkdir OS2025
+mkdir os2025
 ```
 
 进入创建好的文件夹，创建一个`mbr.s`文件
 
 ```bash
 cd os2025
+mkdir index
+cd index
 touch mbr.s
 ```
 
 然后将以下内容保存到`mbr.s`中
 
 ```armasm
-.code
+.code16
 .global start
 start:
     movw %cs, %ax
@@ -159,23 +162,25 @@ start:
     movw %ax, %es
     movw %ax, %ss
     movw $0x7d00, %ax
-    movw %ax, %sp # setting stack pointer to 0x7d
+    movw %ax, %sp # setting stack pointer to 0x7d00
     pushw $13 # pushing the size to print into stack
     pushw $message # pushing the address of message into stack
     callw displayStr # calling the display function
 loop:
     jmp loop
-    message:
+
+message:
     .string "Hello, World!\n\0"
-    displayStr:
+
+displayStr:
     pushw %bp
-    movw 4 (%esp), %ax
+    movw 4(%esp), %ax
     movw %ax, %bp
-    movw 6 (%esp), %cx
+    movw 6(%esp), %cx
     movw $0x1301, %ax
     movw $0x000c, %bx
     movw $0x0000, %dx
-    int $0x
+    int $0x10
     popw %bp
     ret
 ```
@@ -228,7 +233,7 @@ touch genboot.pl
 
 将以下内容保存到文件中
 
-```sh
+```perl
 #!/usr/bin/perl
 
 open(SIG, $ARGV[0]) || die "open $ARGV[0]: $!";
@@ -248,6 +253,7 @@ $buf .= "\x55\xAA";
 open(SIG, ">$ARGV[0]") || die "open >$ARGV[0]: $!";
 print SIG $buf;
 close SIG;
+
 ```
 
 ### 给文件可执行权限
@@ -333,7 +339,7 @@ labX-STUID             # 修改文件夹名称
 │   ├── Makefile
 │   └── ...
 └── report
-└── 231220000.pdf      # 替换为自己的实验报告
+    └── 231220000.pdf      # 替换为自己的实验报告
 ```
 
 
@@ -341,13 +347,13 @@ labX-STUID             # 修改文件夹名称
 > 
 > * labX中的`X`代表实验序号，如lab1，`labX/`目录存放最终版本的源代码、编译脚本
 > * `report/`目录存放实验报告，要求为pdf格式
-> * 在提交作业之前先将STUID更改为 自己的学号 ，例如`mv lab1-STUID lab1- 231220000`
+> * 在提交作业之前先将STUID更改为 自己的学号 ，例如`mv lab1-STUID lab1-231220000`
 > * 然后用`zip -r lab1-231220000.zip lab1-231220100` 将`lab1-231220100`文件夹压缩成一个zip 包
-> * 压缩包以学号命名，例如`lab1-221220000.zip` 是符合格式要求的压缩包名称
+> * 压缩包以学号命名，例如`lab1-231220000.zip` 是符合格式要求的压缩包名称
 > * 为了防止出现编码问题, 压缩包中的所有文件名都不要包含中文
-> * 我们只接受pdf格式, 命名只含学号的实验报告, 不符合格式的实验报告将视为没有提交报告. 例如 `221220000.pdf` 是符合格式要求的实验报告, 但`221220000.docx` 和`221220000张三实验报告.pdf` 不符合要求
+> * 我们只接受pdf格式, 命名只含学号的实验报告, 不符合格式的实验报告将视为没有提交报告. 例如 `231220000.pdf` 是符合格式要求的实验报告, 但`231220000.docx` 和`231220000张三实验报告.pdf` 不符合要求
 > * 作业提交网站 [http://cslabcms.nju.edu.cn](http://cslabcms.nju.edu.cn)
-{: .block-tip}
+{: .block-danger}
 
 ## 实验报告内容
 
@@ -358,7 +364,7 @@ labX-STUID             # 修改文件夹名称
 > * 实验进度：简单描述即可，例如"我完成了所有内容"、"我只完成了xxx"。缺少实验进度的描述，或者描述与实际情况不符，将被视为没有完成本次实验.
 > * 实验结果：图或说明都可，不需要太复杂，确保不要用其他同学的结果；否则以抄袭处理.
 > * 实验修改的代码位置，简单描述为完成本次实验，修改或添加了哪些代码。不需要贴图或一行行解释，大致的文件和函数定位就行.
-{: .block-warning }
+{: .block-danger }
 
 你可以 **自由选择** 报告的其它内容。你不必详细地描述实验过程，但我们鼓励你在报告中描述如下内容：
 
@@ -366,10 +372,9 @@ labX-STUID             # 修改文件夹名称
 * 对讲义或框架代码中某些思考题的看法
 * 或者你的其它想法, 例如实验心得, 对提供帮助的同学的感谢等
 
-> 认真描述实验心得和想法的报告将会获得分数的奖励；思考题选做，完成了也不会得到分数的奖励，但 它们是经过精心准备的，可以加深你对某些知识的理解和认识。如果你实在没有想法，你可以提交一份 不包含任何想法的报告，我们不会强求。但请**不要**
+> 认真描述实验心得和想法的报告将会获得分数的奖励；思考题选做，完成了也不会得到分数的奖励，但它们是经过精心准备的，可以加深你对某些知识的理解和认识。如果你实在没有想法，你可以提交一份不包含任何想法的报告，我们不会强求。但请**不要**
 >
->* 大量粘贴讲义内容&#x20;
->* 大量粘贴代码和贴图, 却没有相应的详细解释(让我们明显看出来是凑字数的)
+> * 大量粘贴讲义内容&#x20;
+> * 大量粘贴代码和贴图, 却没有相应的详细解释(让我们明显看出来是凑字数的)
+> 来让你的报告看起来十分丰富，编写和阅读这样的报告毫无任何意义，你也**不会因此获得更多的分数**， 同时还可能带来**扣分**的可能。
 {: .block-warning}
-
-来让你的报告看起来十分丰富，编写和阅读这样的报告毫无任何意义，你也**不会因此获得更多的分数**， 同时还可能带来**扣分**的可能。
