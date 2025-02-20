@@ -3,3 +3,15 @@
  * Its purpose is for users of the theme to be able to add css rules from a blank file
  *   these get simply added to the ones already active in the layout.
  */
+ 
+.markdown-section>:first-child {
+    color: #333;
+}
+
+h1 {
+    color: #0099CC;
+}
+
+h2 {
+    color: #F77A0B;
+}
